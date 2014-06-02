@@ -16,15 +16,14 @@ import javax.swing.table.TableModel;
 public class QAHGUI extends JFrame implements ActionListener, TableModelListener
 {
 	
-	private JButton btnFav, btnRec, btnAdd, btnPas, btnSearch;
-	private JPanel pnlMenu, pnlTop, pnlButtons, pnlFav;
+	private JButton btnFav, btnRec, btnAdd, btnPas, btnSearch, btnIngr;
+	private JPanel pnlMenu, pnlTop, pnlButtons, pnlFav, pnlPers, pnlIngr;
 	private Object db;// TODO Change Object to Database Type
 	private List<Object> list;// TODO Change object to Recipe?
 	private String[] columnNames = {"Recipe Name"};
-	
 	private Object[][] data;
-	private JTable table;
-	private JScrollPane scrollPane;
+	private JTable tblFav, tblPers;
+	private JScrollPane scrlPnFav, scrlPnPers;
 	private JPanel pnlSearch;
 	private JLabel lblTop, lblRecipe;
 	private JTextField txfSearch, txfTitle;
@@ -32,8 +31,9 @@ public class QAHGUI extends JFrame implements ActionListener, TableModelListener
 	
 	private JPanel pnlAdd;
 	private JLabel[] txfLabel = new JLabel[5];
-	private JTextField[] txfField = new JTextField[5];
-	private JButton btnAddMovie;
+	private JTextField[] txfField = new JTextField[5], ingrField = new JTextField[20];
+	private JButton btnAddRec;
+	private int ingrSize = 0;
 	
 	
 	public QAHGUI() {
@@ -67,7 +67,7 @@ public class QAHGUI extends JFrame implements ActionListener, TableModelListener
 	private void createComponents()
 	{
 		//Menu Panel
-////////////////////////////////////////////////////////
+		////////////////////////////////////////////////////////
 		pnlMenu = new JPanel();
 		
 		pnlTop = new JPanel();
@@ -98,59 +98,72 @@ public class QAHGUI extends JFrame implements ActionListener, TableModelListener
 		add(pnlMenu, BorderLayout.NORTH);
 		
 		//Favorites Panel TODO
-////////////////////////////////////////////////////////
+		////////////////////////////////////////////////////////
 		pnlFav = new JPanel();
-		table = new JTable(data, columnNames);
-		scrollPane = new JScrollPane(table);
-		pnlFav.add(scrollPane);
-		table.getModel().addTableModelListener(this);
+		tblFav = new JTable(data, columnNames);
+		scrlPnFav = new JScrollPane(tblFav);
+		pnlFav.add(scrlPnFav);
+		tblFav.getModel().addTableModelListener(this);
+		
+		add(pnlFav, BorderLayout.CENTER);
 		
 		//Personal Panel TODO
-////////////////////////////////////////////////////////
-		pnlSearch = new JPanel();
-		lblTitle = new JLabel("Enter Title: ");
-		txfTitle = new JTextField(25);
-		btnTitleSearch = new JButton("Search");
-		btnTitleSearch.addActionListener(this);
-		pnlSearch.add(lblTitle);
-		pnlSearch.add(txfTitle);
-		pnlSearch.add(btnTitleSearch);
+		////////////////////////////////////////////////////////
+		pnlPers = new JPanel();
+		tblPers= new JTable(data, columnNames);
+		scrlPnPers = new JScrollPane(tblPers);
+		pnlPers.add(scrlPnPers);
+		tblPers.getModel().addTableModelListener(this);
 		
 		//Add Panel TODO
-////////////////////////////////////////////////////////
+		////////////////////////////////////////////////////////
 		pnlAdd = new JPanel();
 		pnlAdd.setLayout(new GridLayout(6, 0));
-		String labelNames[] = {"Enter Title: ", "Enter Year: ", "Enter Length: ", "Enter Genre: ", "Enter Studio Name: "};
+		String labelNames[] = {"Enter Recipe Name: ", "Enter Category: ", "Enter Preparation Time: ", "Enter Cook Time: "};
 		for (int i=0; i<labelNames.length; i++) {
 			JPanel panel = new JPanel();
 			txfLabel[i] = new JLabel(labelNames[i]);
-			txfField[i] = new JTextField(25);
+			txfField[i] = new JTextField(45);
 			panel.add(txfLabel[i]);
 			panel.add(txfField[i]);
 			pnlAdd.add(panel);
 		}
-		JPanel panel = new JPanel();
-		btnAddMovie = new JButton("Add");
-		btnAddMovie.addActionListener(this);
-		panel.add(btnAddMovie);
-		pnlAdd.add(panel);
-		
-		add(pnlContent, BorderLayout.CENTER);
+		pnlIngr = new JPanel();
+		JPanel panel1 = new JPanel();
+		panel1.add(new JLabel("Enter Ingredient"));
+		ingrField[ingrSize] = new JTextField(45);
+		panel1.add(ingrField[ingrSize]);
+		ingrSize++;
+		pnlIngr.add(panel1);
+		btnIngr = new JButton("Add More Ingredients");
+		btnIngr.addActionListener(this);
+		pnlIngr.add(btnIngr);
+		pnlAdd.add(pnlIngr);
+		JPanel panel2 = new JPanel();
+		btnAddRec = new JButton("Add");
+		btnAddRec.addActionListener(this);
+		panel2.add(btnAddRec);
+		pnlAdd.add(panel2);
 		
 		//Search Result Panel TODO
-////////////////////////////////////////////////////////
+		////////////////////////////////////////////////////////
+		pnlPers = new JPanel();
+		tblPers= new JTable(data, columnNames);
+		scrlPnPers = new JScrollPane(tblPers);
+		pnlPers.add(scrlPnPers);
+		tblPers.getModel().addTableModelListener(this);
 		
 		//Recipe Panel TODO
-////////////////////////////////////////////////////////
+		////////////////////////////////////////////////////////
 		
 		//Change Password Panel TODO
-////////////////////////////////////////////////////////
+		////////////////////////////////////////////////////////
 		
 		//Register Panel TODO
-////////////////////////////////////////////////////////
+		////////////////////////////////////////////////////////
 		
 		//Login Panel TODO
-////////////////////////////////////////////////////////
+		////////////////////////////////////////////////////////
 		
 	}
 
