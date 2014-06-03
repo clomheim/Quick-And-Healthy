@@ -1,5 +1,6 @@
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
+import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -16,52 +17,53 @@ import javax.swing.table.TableModel;
 public class QAHGUI extends JFrame implements ActionListener, TableModelListener
 {
 	
-	private JButton btnFav, btnRec, btnAdd, btnPas, btnSearch, btnIngr;
-	private JPanel pnlMenu, pnlTop, pnlButtons, pnlFav, pnlPers, pnlIngr;
-	private Object db;// TODO Change Object to Database Type
-	private List<Object> list;// TODO Change object to Recipe?
+	private final int FIELD_SIZE = 25;
+	
+	private JButton btnFav, btnRec, btnAdd, btnPas, btnSearch, btnIngr, btnSub, btnReg, btnLog, btnToReg, btnAddRec;
+	private JPanel pnlMenu, pnlTop, pnlButtons, pnlFav, pnlPers, pnlIngr, pnlPass, pnlReg, pnlLog;
+	private RecipeDB db;
+	private List<Recipe> lstRec;
 	private String[] columnNames = {"Recipe Name"};
 	private Object[][] data;
 	private JTable tblFav, tblPers;
 	private JScrollPane scrlPnFav, scrlPnPers;
 	private JPanel pnlSearch;
 	private JLabel lblTop, lblRecipe;
-	private JTextField txfSearch, txfTitle;
-	private JButton btnTitleSearch;
+	private JTextField txfSearch, txfTitle, txfUser, txfUsrLog;
+	private JPasswordField pwfPass, pwfConf, pwfPasLog;
 	
 	private JPanel pnlAdd;
 	private JLabel[] txfLabel = new JLabel[5];
 	private JTextField[] txfField = new JTextField[5], ingrField = new JTextField[20];
-	private JButton btnAddRec;
+	private JPasswordField[] passField = new JPasswordField[3];
 	private int ingrSize = 0;
 	
 	
 	public QAHGUI() {
 		super("Quick And Healthy Meals");
 		
-		//db = new Object(); // TODO change to Database Type
-		/*try  														// TODO Read in Data
-		{
-			list = db.getMovies();
-			
-			data = new Object[list.size()][columnNames.length];
-			for (int i=0; i<list.size(); i++) {
-				data[i][0] = list.get(i).getTitle();
-				data[i][1] = list.get(i).getYear();
-				data[i][2] = list.get(i).getLength();
-				data[i][3] = list.get(i).getGenre();
-				data[i][4] = list.get(i).getStudioName();
-				
-			}
-			
-		} catch (SQLException e)
-		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}*/
+		db = new RecipeDB();
+//		try  														// TODO Read in Data
+//		{
+//			lstRec = db.getMovies();
+//			
+//			data = new Object[list.size()][columnNames.length];
+//			for (int i=0; i<list.size(); i++) {
+//				data[i][0] = list.get(i).getTitle();
+//				data[i][1] = list.get(i).getYear();
+//				data[i][2] = list.get(i).getLength();
+//				data[i][3] = list.get(i).getGenre();
+//				data[i][4] = list.get(i).getStudioName();
+//				
+//			}
+//			
+//		} catch (SQLException e)
+//		{
+//			e.printStackTrace();
+//		}
 		createComponents();
 		setVisible(true);
-		setSize(500, 500);
+		setSize(600, 600);
 	}
     
 	private void createComponents()
@@ -72,7 +74,8 @@ public class QAHGUI extends JFrame implements ActionListener, TableModelListener
 		
 		pnlTop = new JPanel();
 		lblTop = new JLabel("Quick And Healthy Meals");
-		txfSearch = new JTextField(45);
+		lblTop.setFont(new Font("Serif", Font.PLAIN, 20));
+		txfSearch = new JTextField(FIELD_SIZE);
 		btnSearch = new JButton("Search");
 		btnSearch.addActionListener(this);
 		pnlTop.add(lblTop);
@@ -95,7 +98,6 @@ public class QAHGUI extends JFrame implements ActionListener, TableModelListener
 		
 		pnlMenu.add(pnlTop, BorderLayout.NORTH);
 		pnlMenu.add(pnlButtons, BorderLayout.SOUTH);
-		add(pnlMenu, BorderLayout.NORTH);
 		
 		//Favorites Panel TODO
 		////////////////////////////////////////////////////////
@@ -104,8 +106,6 @@ public class QAHGUI extends JFrame implements ActionListener, TableModelListener
 		scrlPnFav = new JScrollPane(tblFav);
 		pnlFav.add(scrlPnFav);
 		tblFav.getModel().addTableModelListener(this);
-		
-		add(pnlFav, BorderLayout.CENTER);
 		
 		//Personal Panel TODO
 		////////////////////////////////////////////////////////
@@ -118,27 +118,28 @@ public class QAHGUI extends JFrame implements ActionListener, TableModelListener
 		//Add Panel TODO
 		////////////////////////////////////////////////////////
 		pnlAdd = new JPanel();
-		pnlAdd.setLayout(new GridLayout(6, 0));
+		pnlAdd.setLayout(new GridLayout(5, 0));
 		String labelNames[] = {"Enter Recipe Name: ", "Enter Category: ", "Enter Preparation Time: ", "Enter Cook Time: "};
 		for (int i=0; i<labelNames.length; i++) {
 			JPanel panel = new JPanel();
 			txfLabel[i] = new JLabel(labelNames[i]);
-			txfField[i] = new JTextField(45);
+			txfField[i] = new JTextField(FIELD_SIZE);
 			panel.add(txfLabel[i]);
 			panel.add(txfField[i]);
 			pnlAdd.add(panel);
 		}
 		pnlIngr = new JPanel();
 		JPanel panel1 = new JPanel();
-		panel1.add(new JLabel("Enter Ingredient"));
-		ingrField[ingrSize] = new JTextField(45);
+		JLabel lab = new JLabel("Enter Ingredients");
+		ingrField[ingrSize] = new JTextField(FIELD_SIZE);
+		panel1.add(lab);
 		panel1.add(ingrField[ingrSize]);
-		ingrSize++;
 		pnlIngr.add(panel1);
+		ingrSize++;
 		btnIngr = new JButton("Add More Ingredients");
 		btnIngr.addActionListener(this);
 		pnlIngr.add(btnIngr);
-		pnlAdd.add(pnlIngr);
+		pnlAdd.add(panel1);
 		JPanel panel2 = new JPanel();
 		btnAddRec = new JButton("Add");
 		btnAddRec.addActionListener(this);
@@ -158,13 +159,79 @@ public class QAHGUI extends JFrame implements ActionListener, TableModelListener
 		
 		//Change Password Panel TODO
 		////////////////////////////////////////////////////////
+		pnlPass = new JPanel();
+		String[] label = {"Old", "New", "New"};
+		for(int i = 0; i < 3; i++){
+			JPanel panel = new JPanel();
+			JLabel str = new JLabel(label[i]);
+			panel.add(str);
+			passField[i] = new JPasswordField(25);
+			panel.add(passField[i]);
+			pnlPass.add(panel1);
+		}
+		btnSub = new JButton("Submit");
+		btnSub.addActionListener(this);
+		pnlPass.add(btnSub);
 		
-		//Register Panel TODO
+		//Register Panel
 		////////////////////////////////////////////////////////
+		pnlReg = new JPanel();
+		pnlReg.setLayout(new GridLayout(4,0));
+		JPanel regPanel1 = new JPanel();
+		JLabel usrnm = new JLabel("Username");
+		txfUser = new JTextField(FIELD_SIZE);
+		regPanel1.add(usrnm);
+		regPanel1.add(txfUser);
+		pnlReg.add(regPanel1);
+		JPanel regPanel2 = new JPanel();
+		JLabel pass = new JLabel("Password");
+		pwfPass = new JPasswordField(FIELD_SIZE);
+		regPanel2.add(pass);
+		regPanel2.add(pwfPass);
+		pnlReg.add(regPanel2);
+		JPanel regPanel3 = new JPanel();
+		JLabel conf = new JLabel("Confirm Password");
+		pwfConf = new JPasswordField(FIELD_SIZE);
+		regPanel3.add(conf);
+		regPanel3.add(pwfConf);
+		pnlReg.add(regPanel3);
+		JPanel regPanel4 = new JPanel();
+		btnReg = new JButton("Register");
+		btnReg.addActionListener(this);
+		regPanel4.add(btnReg);
+		pnlReg.add(regPanel4);
 		
-		//Login Panel TODO
+		//Login Panel
 		////////////////////////////////////////////////////////
+		pnlLog = new JPanel();
+		pnlLog.setLayout(new BorderLayout());
+		lblTop.setHorizontalAlignment(JLabel.CENTER);
+		pnlLog.add(lblTop, BorderLayout.NORTH);
+		JPanel logpnl = new JPanel();
+		logpnl.setLayout(new GridLayout(3,0));
+		JPanel use = new JPanel();
+		JLabel usename = new JLabel("Username");
+		txfUsrLog = new JTextField(FIELD_SIZE);
+		use.add(usename);
+		use.add(txfUsrLog);
+		logpnl.add(use);
+		JPanel pss = new JPanel();
+		JLabel passw = new JLabel("Password");
+		pwfPasLog = new JPasswordField(FIELD_SIZE);
+		pss.add(passw);
+		pss.add(pwfPasLog);
+		logpnl.add(pss);
+		JPanel btnpl = new JPanel();
+		btnLog = new JButton("Login");
+		btnLog.addActionListener(this);
+		btnToReg = new JButton("Register");
+		btnToReg.addActionListener(this);
+		btnpl.add(btnLog);
+		btnpl.add(btnToReg);
+		logpnl.add(btnpl);
+		pnlLog.add(logpnl,BorderLayout.CENTER);
 		
+		add(pnlLog, BorderLayout.NORTH);
 	}
 
 	/**
@@ -177,79 +244,75 @@ public class QAHGUI extends JFrame implements ActionListener, TableModelListener
 	}
 
 	@Override
-	public void actionPerformed(ActionEvent arg0) {
-		// TODO Auto-generated method stub
+	public void actionPerformed(ActionEvent e) {
+		if (e.getSource() == btnFav) {
+			
+		} else if (e.getSource() == btnRec){
+			
+		} else if (e.getSource() == btnAdd) {	
+			
+		} else if (e.getSource() == btnPas) {
+		
+		} else if (e.getSource() == btnSearch) {
+			
+		} else if (e.getSource() == btnIngr) {
+			
+		} else if (e.getSource() == btnSub) {
+				
+		} else if (e.getSource() == btnReg) {
+			String name = txfUser.getText();
+			char[] password = pwfPass.getPassword();
+			char[] confirm = pwfConf.getPassword();
+			boolean same = false;
+			boolean exists = false;
+			if(password.length == confirm.length){
+				for(int i = 0; i < password.length; i++){
+					if(password[i] == confirm[i]){
+						same = true;
+					} else {
+						same = false;
+						break;
+					}
+				}
+			}
+			if(same){
+				//TODO exists =  pass name and password to DB
+				if(exists){
+					JOptionPane.showMessageDialog(this, "That Username is Already Taken!", "", JOptionPane.WARNING_MESSAGE);
+				} else {
+					remove(pnlReg);
+					add(pnlLog, BorderLayout.NORTH);
+					revalidate();
+					repaint();
+				}
+				
+			} else {
+				JOptionPane.showMessageDialog(this, "Passwords Do Not Match!", "", JOptionPane.WARNING_MESSAGE);
+			}
+		
+		} else if (e.getSource() == btnLog) {
+			String name = txfUsrLog.getText();
+			char[] password = pwfPasLog.getPassword();
+			if(true){//TODO check user name and password
+				remove(pnlLog);
+				add(pnlMenu, BorderLayout.NORTH);
+				add(pnlFav, BorderLayout.SOUTH);
+				revalidate();
+				repaint();
+			}
+			
+		} else if (e.getSource() == btnToReg) {
+			remove(pnlLog);
+			add(pnlReg, BorderLayout.NORTH);
+			revalidate();
+			repaint();
+			
+		} else if (e.getSource() == btnAddRec) {
+		
+		}
 		
 	}
 
-//	@Override
-//	public void actionPerformed(ActionEvent e) {
-//		if (e.getSource() == btnList) {
-//			try {
-//				list = db.getMovies();
-//			} catch (SQLException e1) {
-//				// TODO Auto-generated catch block
-//				e1.printStackTrace();
-//			}
-//			data = new Object[list.size()][columnNames.length];
-//			for (int i=0; i<list.size(); i++) {
-//				data[i][0] = list.get(i).getTitle();
-//				data[i][1] = list.get(i).getYear();
-//				data[i][2] = list.get(i).getLength();
-//				data[i][3] = list.get(i).getGenre();
-//				data[i][4] = list.get(i).getStudioName();
-//			}
-//			pnlContent.removeAll();
-//			table = new JTable(data, columnNames);
-//			table.getModel().addTableModelListener(this);
-//			scrollPane = new JScrollPane(table);
-//			pnlContent.add(scrollPane);
-//			pnlContent.revalidate();
-//			this.repaint();
-//			
-//		} else if (e.getSource() == btnSearch) {
-//			pnlContent.removeAll();
-//			pnlContent.add(pnlSearch);
-//			pnlContent.revalidate();
-//			this.repaint();
-//		} else if (e.getSource() == btnAdd) {
-//			pnlContent.removeAll();
-//			pnlContent.add(pnlAdd);
-//			pnlContent.revalidate();
-//			this.repaint();
-//			
-//		} else if (e.getSource() == btnTitleSearch) {
-//			String title = txfTitle.getText();
-//			if (title.length() > 0) {
-//				list = db.getMovies(title);
-//				data = new Object[list.size()][columnNames.length];
-//				for (int i=0; i<list.size(); i++) {
-//					data[i][0] = list.get(i).getTitle();
-//					data[i][1] = list.get(i).getYear();
-//					data[i][2] = list.get(i).getLength();
-//					data[i][3] = list.get(i).getGenre();
-//					data[i][4] = list.get(i).getStudioName();
-//				}
-//				pnlContent.removeAll();
-//				table = new JTable(data, columnNames);
-//				table.getModel().addTableModelListener(this);
-//				scrollPane = new JScrollPane(table);
-//				pnlContent.add(scrollPane);
-//				pnlContent.revalidate();
-//				this.repaint();
-//			}
-//		} else if (e.getSource() == btnAddMovie) {
-//			Movie movie = new Movie(txfField[0].getText(), Integer.parseInt(txfField[1].getText())
-//					,Integer.parseInt(txfField[2].getText()), txfField[3].getText(), txfField[4].getText() );
-//			db.addMovie(movie);
-//			JOptionPane.showMessageDialog(null, "Added Successfully!");
-//			for (int i=0; i<txfField.length; i++) {
-//				txfField[i].setText("");
-//			}
-//		}
-//		
-//	}
-//
 	@Override
 	public void tableChanged(TableModelEvent e) {
 		int row = e.getFirstRow();
