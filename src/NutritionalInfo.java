@@ -1,6 +1,7 @@
 
 public class NutritionalInfo {
 	private float my_servingSize;
+	private String my_servingSizeUnit;
 	private int my_calories;
 	private int my_caloriesFromFat; 
 	private int my_saturatedFat; 
@@ -15,10 +16,11 @@ public class NutritionalInfo {
 	private int my_calcium; 
 	private int my_iron;
 	
-	public NutritionalInfo(float servingSize, int calories, int caloriesFromFat, int saturatedFat, 
+	public NutritionalInfo(float servingSize, String servingSizeUnit, int calories, int caloriesFromFat, int saturatedFat, 
 							int cholesterol, int sodium, int totalCarbs, int fiber, int sugars, 
 							int protein, int vitA, int vitC, int calcium, int iron) {
-		my_servingSize = servingSize; 
+		my_servingSize = servingSize;
+		my_servingSizeUnit = servingSizeUnit;
 		my_calories = calories;
 		my_caloriesFromFat = caloriesFromFat; 
 		my_saturatedFat = saturatedFat; 

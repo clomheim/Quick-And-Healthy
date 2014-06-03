@@ -22,13 +22,13 @@ public class QAHGUI extends JFrame implements ActionListener, TableModelListener
 	private JButton btnFav, btnRec, btnAdd, btnPas, btnSearch, btnIngr, btnSub, btnReg, btnLog, btnToReg, btnAddRec;
 	private JPanel pnlMenu, pnlTop, pnlButtons, pnlFav, pnlPers, pnlIngr, pnlPass, pnlReg, pnlLog;
 	private RecipeDB db;
-	private List<Recipe> lstRec;
+	private List<Recipe> list;
 	private String[] columnNames = {"Recipe Name"};
 	private Object[][] data;
 	private JTable tblFav, tblPers;
 	private JScrollPane scrlPnFav, scrlPnPers;
 	private JPanel pnlSearch;
-	private JLabel lblTop, lblRecipe;
+	private JLabel lblTop;
 	private JTextField txfSearch, txfTitle, txfUser, txfUsrLog;
 	private JPasswordField pwfPass, pwfConf, pwfPasLog;
 	
@@ -43,24 +43,20 @@ public class QAHGUI extends JFrame implements ActionListener, TableModelListener
 		super("Quick And Healthy Meals");
 		
 		db = new RecipeDB();
-//		try  														// TODO Read in Data
-//		{
-//			lstRec = db.getMovies();
-//			
-//			data = new Object[list.size()][columnNames.length];
-//			for (int i=0; i<list.size(); i++) {
-//				data[i][0] = list.get(i).getTitle();
-//				data[i][1] = list.get(i).getYear();
-//				data[i][2] = list.get(i).getLength();
-//				data[i][3] = list.get(i).getGenre();
-//				data[i][4] = list.get(i).getStudioName();
-//				
-//			}
-//			
-//		} catch (SQLException e)
-//		{
-//			e.printStackTrace();
-//		}
+		try
+		{
+			list = db.getRecipes();
+			
+			data = new Object[list.size()][columnNames.length];
+			for (int i=0; i<list.size(); i++) {
+				data[i][0] = list.get(i).getRecipeTitle();
+				
+			}
+			
+		} catch (SQLException e)
+		{
+			e.printStackTrace();
+		}
 		createComponents();
 		setVisible(true);
 		setSize(600, 600);
@@ -71,6 +67,7 @@ public class QAHGUI extends JFrame implements ActionListener, TableModelListener
 		//Menu Panel
 		////////////////////////////////////////////////////////
 		pnlMenu = new JPanel();
+		pnlMenu.setLayout(new GridLayout(2,0));
 		
 		pnlTop = new JPanel();
 		lblTop = new JLabel("Quick And Healthy Meals");
@@ -205,7 +202,9 @@ public class QAHGUI extends JFrame implements ActionListener, TableModelListener
 		////////////////////////////////////////////////////////
 		pnlLog = new JPanel();
 		pnlLog.setLayout(new BorderLayout());
+		lblTop = new JLabel("Quack And Healthy Meals");
 		lblTop.setHorizontalAlignment(JLabel.CENTER);
+		lblTop.setFont(new Font("Serif", Font.PLAIN, 20));
 		pnlLog.add(lblTop, BorderLayout.NORTH);
 		JPanel logpnl = new JPanel();
 		logpnl.setLayout(new GridLayout(3,0));

@@ -18,6 +18,7 @@ public class Recipe {
 	public Recipe(int recipeID, String recipeTitle, String category, Date prepTime, 
 					Date cookTime, List<String> ingredients, String directions, NutritionalInfo nutritionalInfo) {
 
+		my_recipeTitle = recipeTitle;
 		my_category = category;
 		my_prepTime = prepTime; 
 		my_cookTime = cookTime; 
@@ -29,6 +30,7 @@ public class Recipe {
 		my_directions = directions;
 		my_nutritionalInfo = nutritionalInfo;
 	}
+	
 	
 	public void setNutritionalInfo(NutritionalInfo the_info) {
 		my_nutritionalInfo = the_info;
