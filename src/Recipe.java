@@ -7,7 +7,6 @@ import java.util.List;
  *
  */
 public class Recipe {
-	private int my_recipeID;
 	private String my_recipeTitle;
 	private String my_category;
 	private Date my_prepTime;
@@ -18,7 +17,7 @@ public class Recipe {
 	
 	public Recipe(int recipeID, String recipeTitle, String category, Date prepTime, 
 					Date cookTime, List<String> ingredients, String directions, NutritionalInfo nutritionalInfo) {
-		my_recipeID = recipeID; 
+
 		my_category = category;
 		my_prepTime = prepTime; 
 		my_cookTime = cookTime; 
@@ -33,6 +32,14 @@ public class Recipe {
 	
 	public void setNutritionalInfo(NutritionalInfo the_info) {
 		my_nutritionalInfo = the_info;
+	}
+	
+	public String getRecipeTitle() {
+		return my_recipeTitle;
+	}
+	
+	public String getCategory() {
+		return my_category;
 	}
 	
 	@Override
