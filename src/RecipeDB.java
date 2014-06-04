@@ -4,6 +4,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Time;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Properties;
@@ -65,8 +66,8 @@ public class RecipeDB {
 				int id = rs.getInt("recipeID");
 				String title = rs.getString("recipeTitle");
 				String cat = rs.getString("category");
-				Date prep = rs.getDate("prepTime");
-				Date cook = rs.getDate("cookTime");
+				Time prep = rs.getTime("prepTime");
+				Time cook = rs.getTime("cookTime");
 				List<String> ingr = getIngredients(id);
 				String dir = rs.getString("directions");
 				NutritionalInfo ni = getNutInfo(id);
@@ -163,7 +164,18 @@ public class RecipeDB {
 		
 		return ni;
 	}
-	public static void addRecipe(User user, Recipe recipe) {
+	
+	/** 
+	 * Adds a recipe to the database.
+	 * @param user The user to whom the recipe belongs.
+	 * @param recipe The recipe to be added.
+	 * @throws SQLException
+	 * @author Erica
+	 */
+	public static void addRecipe(User user, Recipe recipe) throws SQLException {
+		if (conn == null) {
+			createConnection();
+		}
 		String sql = "INSERT INTO Recipe VALUES (?, ?, ?, ?, ?, ?, ?, NULL)";
 		
 		PreparedStatement prepStatement = null; 
@@ -175,13 +187,86 @@ public class RecipeDB {
 			prepStatement.setString(2, user.getUsername());
 			prepStatement.setString(3, recipe.getRecipeTitle());
 			prepStatement.setString(4,  recipe.getCategory());
-			// TODO finish this.
+			prepStatement.setTime(5, recipe.getPrepTime());
+			prepStatement.setTime(6, recipe.getCookTime());
+			prepStatement.executeUpdate();
 		} catch (SQLException e) {
-			
+			System.out.println(e);
+			e.printStackTrace();
 		}
 	}
 	
 	public static void incrementRecipeID() {
 		recipe_id++;
+	}
+	
+	/**
+	 * Checks whether or not a user exists in the database.
+	 * @param user The user to check for.
+	 * @return True if the user was found, false otherwise.
+	 */
+	public static boolean userExists(User user) throws SQLException {
+		if (conn == null) {
+			createConnection();
+		}
+		boolean found = false;
+		
+		String query = "SELECT username FROM User WHERE username = " 
+						+  user.getUsername() + ";";
+ 
+		Statement statement = null;
+		
+		try {
+			statement = conn.createStatement();
+			ResultSet rs = statement.executeQuery(query);
+			String name = rs.getString("username");
+			
+			if (name != null) {
+				found = true;
+			}
+			
+		} catch (SQLException e) {
+			System.out.println(e);
+			e.printStackTrace();
+		}
+		
+		return found;
+	}
+	
+	/**
+	 * Compares the user-input password against the password that user has on their account.
+	 * @param user The user who is trying to login.
+	 * @param password The password the user entered at login.
+	 * @return True if the user successfully logs in, false otherwise.
+	 * @throws SQLException
+	 * @author Erica
+	 */
+	public boolean LoginValidation(User user, String password) throws SQLException {
+		if (conn == null) {
+			createConnection();
+		}
+		
+		boolean matchFound = false;
+		
+		String query = "SELECT userPassword FROM User WHERE username = " 
+					+ user.getUsername() +";";
+		
+		Statement statement = null;
+		
+		try {
+			statement = conn.createStatement();
+			ResultSet rs = statement.executeQuery(query);
+			String pass = rs.getString("userPassword");
+			
+			if (pass.equals(user.getPassword())) {
+				matchFound = true;
+			}
+			
+		} catch (SQLException e) {
+			System.out.println(e);
+			e.printStackTrace();
+		}
+		
+		return matchFound;
 	}
 }
