@@ -11,7 +11,7 @@ import java.util.Properties;
 import java.util.List;
 
 /**
- * Connects the recipe object to the recipe table in the database.
+ * Connects java objects to the objects in the database.
  * @author Erica
  * @version 06/2/2014
  */
@@ -215,6 +215,7 @@ public class RecipeDB {
 			prepStatement = conn.prepareStatement(sql);
 			prepStatement.setInt(1,  recipe.getRecipeID());
 			prepStatement.setString(2, ingredient);
+			prepStatement.executeUpdate();
  		} catch (SQLException e) {
  			System.out.println(e);
 			e.printStackTrace();	
@@ -226,18 +227,43 @@ public class RecipeDB {
 	}
 	
 	/**
+	 * Adds a new user to the database.
+	 * @param user The user to be added to the database.
+	 * @param password The users chosen password.
+	 * @throws SQLException
+	 * @author Erica
+	 */
+	public static void registerUser(String user, String password) throws SQLException {
+		if (conn == null) {
+			createConnection();
+		}
+		String sql = "INSERT INTO User VALUES (?, ?, NULL)";
+		PreparedStatement statement = null; 
+		
+		try {
+			statement = conn.prepareStatement(sql);
+			statement.setString(1,  user);
+			statement.setString(2, password);
+			statement.executeUpdate();
+		} catch (SQLException e) {
+			System.out.println(e);
+			e.printStackTrace();
+		}
+	}
+	
+	/**
 	 * Checks whether or not a user exists in the database.
 	 * @param user The user to check for.
 	 * @return True if the user was found, false otherwise.
 	 */
-	public static boolean userExists(User user) throws SQLException {
+	public static boolean userExists(String user) throws SQLException {
 		if (conn == null) {
 			createConnection();
 		}
 		boolean found = false;
 		
 		String query = "SELECT username FROM User WHERE username = " 
-						+  user.getUsername() + ";";
+						+  user + ";";
  
 		Statement statement = null;
 		
@@ -266,7 +292,7 @@ public class RecipeDB {
 	 * @throws SQLException
 	 * @author Erica
 	 */
-	public boolean loginValidation(User user, String password) throws SQLException {
+	public boolean loginValidation(String user, String password) throws SQLException {
 		if (conn == null) {
 			createConnection();
 		}
@@ -274,7 +300,7 @@ public class RecipeDB {
 		boolean matchFound = false;
 		
 		String query = "SELECT userPassword FROM User WHERE username = " 
-					+ user.getUsername() +";";
+					+ user +";";
 		
 		Statement statement = null;
 		
@@ -283,7 +309,7 @@ public class RecipeDB {
 			ResultSet rs = statement.executeQuery(query);
 			String pass = rs.getString("userPassword");
 			
-			if (pass.equals(user.getPassword())) {
+			if (pass.equals(user)) {
 				matchFound = true;
 			}
 			
