@@ -237,7 +237,7 @@ public class RecipeDB {
 		if (conn == null) {
 			createConnection();
 		}
-		String sql = "INSERT INTO User VALUES (?, ?, NULL)";
+		String sql = "INSERT INTO quickandhealthymeals.user VALUES (?, ?)";
 		PreparedStatement statement = null; 
 		
 		try {
@@ -262,7 +262,7 @@ public class RecipeDB {
 		}
 		boolean found = false;
 		
-		String query = "SELECT username FROM User WHERE username = " 
+		String query = "SELECT username FROM quickandhealthymeals.user WHERE username = " 
 						+  user + ";";
  
 		Statement statement = null;
@@ -292,24 +292,27 @@ public class RecipeDB {
 	 * @throws SQLException
 	 * @author Erica
 	 */
-	public boolean loginValidation(String user, String password) throws SQLException {
+	public static boolean loginValidation(String user, String password) throws SQLException {
 		if (conn == null) {
 			createConnection();
 		}
 		
 		boolean matchFound = false;
 		
-		String query = "SELECT userPassword FROM User WHERE username = " 
-					+ user +";";
+		String query = "SELECT userPassword FROM quickandhealthymeals.user WHERE username = '" 
+					+ user +"';";
 		
 		Statement statement = null;
 		
 		try {
 			statement = conn.createStatement();
 			ResultSet rs = statement.executeQuery(query);
-			String pass = rs.getString("userPassword");
+			String pass = "";
+			if(rs.next()){
+				pass = rs.getString("userPassword");
+			}
 			
-			if (pass.equals(user)) {
+			if (pass.equals(password)) {
 				matchFound = true;
 			}
 			

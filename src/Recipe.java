@@ -1,3 +1,4 @@
+import java.sql.Time;
 import java.util.Date;
 import java.util.List;
 
@@ -7,17 +8,19 @@ import java.util.List;
  *
  */
 public class Recipe {
+	private int my_recipeID;
 	private String my_recipeTitle;
 	private String my_category;
-	private Date my_prepTime;
-	private Date my_cookTime;
+	private Time my_prepTime;
+	private Time my_cookTime;
 	private List<String> my_ingredients;
 	private String my_directions;
 	private NutritionalInfo my_nutritionalInfo;
 	
-	public Recipe(int recipeID, String recipeTitle, String category, Date prepTime, 
-					Date cookTime, List<String> ingredients, String directions, NutritionalInfo nutritionalInfo) {
+	public Recipe(int recipeID, String recipeTitle, String category, Time prepTime, 
+					Time cookTime, List<String> ingredients, String directions, NutritionalInfo nutritionalInfo) {
 
+		my_recipeID = recipeID;
 		my_recipeTitle = recipeTitle;
 		my_category = category;
 		my_prepTime = prepTime; 
@@ -36,12 +39,24 @@ public class Recipe {
 		my_nutritionalInfo = the_info;
 	}
 	
+	public int getRecipeID() {
+		return my_recipeID;
+	}
+	
 	public String getRecipeTitle() {
 		return my_recipeTitle;
 	}
 	
 	public String getCategory() {
 		return my_category;
+	}
+	
+	public Time getPrepTime() {
+		return my_prepTime;
+	}
+	
+	public Time getCookTime() {
+		return my_cookTime;
 	}
 	
 	@Override

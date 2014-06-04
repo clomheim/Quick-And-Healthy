@@ -1,4 +1,5 @@
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.GridLayout;
@@ -14,27 +15,28 @@ import javax.swing.event.TableModelListener;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableModel;
 
+@SuppressWarnings("serial")
 public class QAHGUI extends JFrame implements ActionListener, TableModelListener
 {
 	
 	private final int FIELD_SIZE = 25;
 	
 	private JButton btnFav, btnRec, btnAdd, btnPas, btnSearch, btnIngr, btnSub, btnReg, btnLog, btnToReg, btnAddRec;
-	private JPanel pnlMenu, pnlTop, pnlButtons, pnlFav, pnlPers, pnlIngr, pnlPass, pnlReg, pnlLog;
+	private JPanel pnlMenu, pnlTop, pnlButtons, pnlFav, pnlPers, pnlIngr, pnlPass, pnlReg, pnlLog, content;
 	private RecipeDB db;
 	private List<Recipe> list;
 	private String[] columnNames = {"Recipe Name"};
 	private Object[][] data;
-	private JTable tblFav, tblPers;
-	private JScrollPane scrlPnFav, scrlPnPers;
+	private JTable tblFav, tblPers, tblSearch;
+	private JScrollPane scrlPnFav, scrlPnPers, scrlPnSearch, scrlPnAdd;
 	private JPanel pnlSearch;
 	private JLabel lblTop;
 	private JTextField txfSearch, txfTitle, txfUser, txfUsrLog;
 	private JPasswordField pwfPass, pwfConf, pwfPasLog;
 	
 	private JPanel pnlAdd;
-	private JLabel[] txfLabel = new JLabel[5];
-	private JTextField[] txfField = new JTextField[5], ingrField = new JTextField[20];
+	private JLabel[] txfLabel = new JLabel[5], nutLabel = new JLabel[15];
+	private JTextField[] txfField = new JTextField[5], ingrField = new JTextField[20], nutField = new JTextField[15];
 	private JPasswordField[] passField = new JPasswordField[3];
 	private int ingrSize = 0;
 	
@@ -115,7 +117,7 @@ public class QAHGUI extends JFrame implements ActionListener, TableModelListener
 		//Add Panel TODO
 		////////////////////////////////////////////////////////
 		pnlAdd = new JPanel();
-		pnlAdd.setLayout(new GridLayout(5, 0));
+		pnlAdd.setLayout(new BoxLayout(pnlAdd, BoxLayout.Y_AXIS));
 		String labelNames[] = {"Enter Recipe Name: ", "Enter Category: ", "Enter Preparation Time: ", "Enter Cook Time: "};
 		for (int i=0; i<labelNames.length; i++) {
 			JPanel panel = new JPanel();
@@ -126,30 +128,47 @@ public class QAHGUI extends JFrame implements ActionListener, TableModelListener
 			pnlAdd.add(panel);
 		}
 		pnlIngr = new JPanel();
-		JPanel panel1 = new JPanel();
+		pnlIngr.setLayout(new BoxLayout(pnlIngr,BoxLayout.Y_AXIS));
+		JPanel addPanel1 = new JPanel();
 		JLabel lab = new JLabel("Enter Ingredients");
 		ingrField[ingrSize] = new JTextField(FIELD_SIZE);
-		panel1.add(lab);
-		panel1.add(ingrField[ingrSize]);
-		pnlIngr.add(panel1);
+		addPanel1.add(lab);
+		addPanel1.add(ingrField[ingrSize]);
+		pnlIngr.add(addPanel1);
 		ingrSize++;
+		JPanel btn = new JPanel();
 		btnIngr = new JButton("Add More Ingredients");
 		btnIngr.addActionListener(this);
-		pnlIngr.add(btnIngr);
-		pnlAdd.add(panel1);
+		btn.add(btnIngr);
+		pnlIngr.add(btn);
+		pnlAdd.add(pnlIngr);
 		JPanel panel2 = new JPanel();
+		String nutInfo[] = {"Enter Serving Size: ", "Enter Serving Size Unit: ", "Enter Calories: ", "Enter Calories From Fat: ", "Enter Saturated Fat: ",
+				"Enter Cholestoral: ", "Enter Sodium: ", "Enter Total Carbohydrates: ", "Enter Dietary Fiber: ", "Enter Sugars: ", "Enter Protein: ", "Enter Vitamin A: ",
+				"Enter Vitamin C: ", "Enter Calcium: ", "Enter Iron: "};
+		for (int i=0; i<nutInfo.length; i++) {
+			JPanel panel = new JPanel();
+			nutLabel[i] = new JLabel(nutInfo[i]);
+			nutField[i] = new JTextField(FIELD_SIZE);
+			panel.add(nutLabel[i]);
+			panel.add(nutField[i]);
+			pnlAdd.add(panel);
+		}
 		btnAddRec = new JButton("Add");
 		btnAddRec.addActionListener(this);
 		panel2.add(btnAddRec);
 		pnlAdd.add(panel2);
 		
+		scrlPnAdd = new JScrollPane(pnlAdd);
+		scrlPnAdd.setPreferredSize(new Dimension(580, 480));
+		
 		//Search Result Panel TODO
 		////////////////////////////////////////////////////////
-		pnlPers = new JPanel();
-		tblPers= new JTable(data, columnNames);
-		scrlPnPers = new JScrollPane(tblPers);
-		pnlPers.add(scrlPnPers);
-		tblPers.getModel().addTableModelListener(this);
+		pnlSearch = new JPanel();
+		tblSearch= new JTable(data, columnNames);
+		scrlPnSearch = new JScrollPane(tblSearch);
+		pnlSearch.add(scrlPnSearch);
+		tblSearch.getModel().addTableModelListener(this);
 		
 		//Recipe Panel TODO
 		////////////////////////////////////////////////////////
@@ -164,7 +183,7 @@ public class QAHGUI extends JFrame implements ActionListener, TableModelListener
 			panel.add(str);
 			passField[i] = new JPasswordField(25);
 			panel.add(passField[i]);
-			pnlPass.add(panel1);
+			pnlPass.add(panel);
 		}
 		btnSub = new JButton("Submit");
 		btnSub.addActionListener(this);
@@ -245,19 +264,23 @@ public class QAHGUI extends JFrame implements ActionListener, TableModelListener
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		if (e.getSource() == btnFav) {
-			
+			//TODO
 		} else if (e.getSource() == btnRec){
-			
-		} else if (e.getSource() == btnAdd) {	
-			
+			//TODO
+		} else if (e.getSource() == btnAdd) {
+			//TODO
+			content.removeAll();
+			content.add(scrlPnAdd);
+			revalidate();
+			repaint();
 		} else if (e.getSource() == btnPas) {
-		
+			//TODO
 		} else if (e.getSource() == btnSearch) {
-			
+			//TODO
 		} else if (e.getSource() == btnIngr) {
-			
+			//TODO
 		} else if (e.getSource() == btnSub) {
-				
+			//TODO
 		} else if (e.getSource() == btnReg) {
 			String name = txfUser.getText();
 			char[] password = pwfPass.getPassword();
@@ -275,10 +298,20 @@ public class QAHGUI extends JFrame implements ActionListener, TableModelListener
 				}
 			}
 			if(same){
-				//TODO exists =  pass name and password to DB
+				try{
+					exists =  RecipeDB.userExists(name);
+				} catch (SQLException ex){
+					ex.printStackTrace();
+				}
 				if(exists){
 					JOptionPane.showMessageDialog(this, "That Username is Already Taken!", "", JOptionPane.WARNING_MESSAGE);
 				} else {
+					String pass = new String(password);
+					try{
+						RecipeDB.registerUser(name, pass);
+					} catch (SQLException ex){
+						ex.printStackTrace();
+					}
 					remove(pnlReg);
 					add(pnlLog, BorderLayout.NORTH);
 					revalidate();
@@ -291,14 +324,25 @@ public class QAHGUI extends JFrame implements ActionListener, TableModelListener
 		
 		} else if (e.getSource() == btnLog) {
 			String name = txfUsrLog.getText();
-			char[] password = pwfPasLog.getPassword();
-			if(true){//TODO check user name and password
-				remove(pnlLog);
-				add(pnlMenu, BorderLayout.NORTH);
-				add(pnlFav, BorderLayout.SOUTH);
-				revalidate();
-				repaint();
+			char[] c = pwfPasLog.getPassword();
+			String password = new String(c);
+			try{
+				if(RecipeDB.loginValidation(name, password)){
+					remove(pnlLog);
+					add(pnlMenu, BorderLayout.NORTH);
+					content = new JPanel();
+					content.add(pnlFav);
+					add(content, BorderLayout.SOUTH);
+					revalidate();
+					repaint();
+				} else {
+					JOptionPane.showMessageDialog(this, "That Login Information does not exist.", "", JOptionPane.WARNING_MESSAGE);
+				}
+			} catch (SQLException ex){
+				ex.printStackTrace();
 			}
+				
+		
 			
 		} else if (e.getSource() == btnToReg) {
 			remove(pnlLog);
@@ -307,7 +351,7 @@ public class QAHGUI extends JFrame implements ActionListener, TableModelListener
 			repaint();
 			
 		} else if (e.getSource() == btnAddRec) {
-		
+		//TODO
 		}
 		
 	}
