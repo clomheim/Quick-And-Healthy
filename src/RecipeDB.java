@@ -182,7 +182,7 @@ public class RecipeDB {
 		
 		try {
 			prepStatement = conn.prepareStatement(sql);
-			prepStatement.setInt(1, recipe_id);
+			prepStatement.setInt(1, recipe.getRecipeID());
 			incrementRecipeID();
 			prepStatement.setString(2, user.getUsername());
 			prepStatement.setString(3, recipe.getRecipeTitle());
@@ -196,7 +196,32 @@ public class RecipeDB {
 		}
 	}
 	
-	public static void incrementRecipeID() {
+	/**
+	 * Adds an ingredient to the recipe.
+	 * @param recipe The recipe that the ingredient is being added to.
+	 * @param ingredient The ingredient to add to the recipe.
+	 * @throws SQLException
+	 * @author Erica
+	 */
+	public static void addIngredientToRecipe(Recipe recipe, String ingredient) throws SQLException {
+		if (conn == null) {
+			createConnection();
+		}
+		String sql = "INSERT INTO recipeIngredients VALUES (?, ?, NULL)";
+		
+		PreparedStatement prepStatement = null; 
+		
+		try {
+			prepStatement = conn.prepareStatement(sql);
+			prepStatement.setInt(1,  recipe.getRecipeID());
+			prepStatement.setString(2, ingredient);
+ 		} catch (SQLException e) {
+ 			System.out.println(e);
+			e.printStackTrace();	
+ 		}
+	}
+	
+	private static void incrementRecipeID() {
 		recipe_id++;
 	}
 	
@@ -241,7 +266,7 @@ public class RecipeDB {
 	 * @throws SQLException
 	 * @author Erica
 	 */
-	public boolean LoginValidation(User user, String password) throws SQLException {
+	public boolean loginValidation(User user, String password) throws SQLException {
 		if (conn == null) {
 			createConnection();
 		}
