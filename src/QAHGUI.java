@@ -3,6 +3,7 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.GridLayout;
+import java.awt.HeadlessException;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.SQLException;
@@ -39,6 +40,7 @@ public class QAHGUI extends JFrame implements ActionListener, TableModelListener
 	private JTextField[] txfField = new JTextField[5], ingrField = new JTextField[20], nutField = new JTextField[15];
 	private JPasswordField[] passField = new JPasswordField[3];
 	private int ingrSize = 0;
+	private String username;
 	
 	
 	public QAHGUI() {
@@ -130,7 +132,7 @@ public class QAHGUI extends JFrame implements ActionListener, TableModelListener
 		pnlIngr = new JPanel();
 		pnlIngr.setLayout(new BoxLayout(pnlIngr,BoxLayout.Y_AXIS));
 		JPanel addPanel1 = new JPanel();
-		JLabel lab = new JLabel("Enter Ingredients");
+		JLabel lab = new JLabel("Enter Ingredient");
 		ingrField[ingrSize] = new JTextField(FIELD_SIZE);
 		addPanel1.add(lab);
 		addPanel1.add(ingrField[ingrSize]);
@@ -140,8 +142,8 @@ public class QAHGUI extends JFrame implements ActionListener, TableModelListener
 		btnIngr = new JButton("Add More Ingredients");
 		btnIngr.addActionListener(this);
 		btn.add(btnIngr);
-		pnlIngr.add(btn);
 		pnlAdd.add(pnlIngr);
+		pnlAdd.add(btn);
 		JPanel panel2 = new JPanel();
 		String nutInfo[] = {"Enter Serving Size: ", "Enter Serving Size Unit: ", "Enter Calories: ", "Enter Calories From Fat: ", "Enter Saturated Fat: ",
 				"Enter Cholestoral: ", "Enter Sodium: ", "Enter Total Carbohydrates: ", "Enter Dietary Fiber: ", "Enter Sugars: ", "Enter Protein: ", "Enter Vitamin A: ",
@@ -176,6 +178,7 @@ public class QAHGUI extends JFrame implements ActionListener, TableModelListener
 		//Change Password Panel TODO
 		////////////////////////////////////////////////////////
 		pnlPass = new JPanel();
+		pnlPass.setLayout(new BoxLayout(pnlPass,BoxLayout.Y_AXIS));
 		String[] label = {"Old", "New", "New"};
 		for(int i = 0; i < 3; i++){
 			JPanel panel = new JPanel();
@@ -268,19 +271,62 @@ public class QAHGUI extends JFrame implements ActionListener, TableModelListener
 		} else if (e.getSource() == btnRec){
 			//TODO
 		} else if (e.getSource() == btnAdd) {
-			//TODO
 			content.removeAll();
 			content.add(scrlPnAdd);
 			revalidate();
 			repaint();
 		} else if (e.getSource() == btnPas) {
-			//TODO
+			remove(content);
+			content.removeAll();
+			content.add(pnlPass);
+			add(content, BorderLayout.CENTER);
+			revalidate();
+			repaint();
 		} else if (e.getSource() == btnSearch) {
 			//TODO
 		} else if (e.getSource() == btnIngr) {
-			//TODO
+			JPanel ingr = new JPanel();
+			ingr.add(new JLabel("Enter Ingredient"));
+			ingrField[ingrSize] = new JTextField(FIELD_SIZE);
+			ingr.add(ingrField[ingrSize]);
+			ingrSize++;
+			pnlIngr.add(ingr);
+			if(ingrSize == 20){
+				btnIngr.setEnabled(false);
+			}
+			revalidate();
+			repaint();
 		} else if (e.getSource() == btnSub) {
 			//TODO
+			char[] old  = passField[0].getPassword();
+			char[] newPass = passField[1].getPassword();
+			char[] confPass = passField[2].getPassword();
+			boolean same = false;
+			String oldPassword = new String(old);
+			String newPassword = new String(newPass);
+			for (int i = 0; i < newPass.length; i++){
+				if(newPass[i] == confPass[i]){
+					same = true;
+				} else {
+					same = false;
+					break;
+				}
+			}
+			if(same){
+				try {
+					if (RecipeDB.loginValidation(username, oldPassword)) {
+						//TODO register new password
+						RecipeDB.changePassword(username, newPassword);
+					} else {
+						JOptionPane.showMessageDialog(this, "Passwordand Username Do Not Match!", "", JOptionPane.WARNING_MESSAGE);
+					}
+				} catch (SQLException e1) {
+					e1.printStackTrace();
+				}
+			} else {
+				JOptionPane.showMessageDialog(this, "Passwords Do Not Match!", "", JOptionPane.WARNING_MESSAGE);
+			}
+			
 		} else if (e.getSource() == btnReg) {
 			String name = txfUser.getText();
 			char[] password = pwfPass.getPassword();
@@ -316,18 +362,16 @@ public class QAHGUI extends JFrame implements ActionListener, TableModelListener
 					add(pnlLog, BorderLayout.NORTH);
 					revalidate();
 					repaint();
-				}
-				
+				}	
 			} else {
 				JOptionPane.showMessageDialog(this, "Passwords Do Not Match!", "", JOptionPane.WARNING_MESSAGE);
 			}
-		
 		} else if (e.getSource() == btnLog) {
-			String name = txfUsrLog.getText();
+			username = txfUsrLog.getText();
 			char[] c = pwfPasLog.getPassword();
 			String password = new String(c);
 			try{
-				if(RecipeDB.loginValidation(name, password)){
+				if(RecipeDB.loginValidation(username, password)){
 					remove(pnlLog);
 					add(pnlMenu, BorderLayout.NORTH);
 					content = new JPanel();
@@ -341,9 +385,6 @@ public class QAHGUI extends JFrame implements ActionListener, TableModelListener
 			} catch (SQLException ex){
 				ex.printStackTrace();
 			}
-				
-		
-			
 		} else if (e.getSource() == btnToReg) {
 			remove(pnlLog);
 			add(pnlReg, BorderLayout.NORTH);
@@ -352,6 +393,10 @@ public class QAHGUI extends JFrame implements ActionListener, TableModelListener
 			
 		} else if (e.getSource() == btnAddRec) {
 		//TODO
+			//Read Fields
+			btnIngr.setEnabled(true);
+			//Add Recipe
+			//Go to My recipes
 		}
 		
 	}
