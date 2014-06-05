@@ -35,6 +35,7 @@ public class QAHGUI extends JFrame implements ActionListener, MouseListener
 	private JTextField txfSearch, txfUser, txfUsrLog;
 	private JPasswordField pwfPass, pwfConf, pwfPasLog;
 	private JTextArea txaDirs;
+	private JComboBox<Category> categories;
 	
 	private JPanel pnlAdd;
 	private JLabel[] txfLabel = new JLabel[4], nutLabel = new JLabel[15];
@@ -126,15 +127,30 @@ public class QAHGUI extends JFrame implements ActionListener, MouseListener
 		////////////////////////////////////////////////////////
 		pnlAdd = new JPanel();
 		pnlAdd.setLayout(new BoxLayout(pnlAdd, BoxLayout.Y_AXIS));
-		String labelNames[] = {"Enter Recipe Name: ", "Enter Category: ", "Enter Preparation Time: ", "Enter Cook Time: "};
-		for (int i=0; i<labelNames.length; i++) {
-			JPanel panel = new JPanel();
-			txfLabel[i] = new JLabel(labelNames[i]);
-			txfField[i] = new JTextField(FIELD_SIZE);
-			panel.add(txfLabel[i]);
-			panel.add(txfField[i]);
-			pnlAdd.add(panel);
-		}
+		String labelNames[] = {"Enter Recipe Name: ",  "Enter Preparation Time: ", "Enter Cook Time: "};
+		JPanel panel11 = new JPanel();
+		txfLabel[0] = new JLabel(labelNames[0]);
+		txfField[0] = new JTextField(FIELD_SIZE);
+		panel11.add(txfLabel[0]);
+		panel11.add(txfField[0]);
+		pnlAdd.add(panel11);
+		JPanel panel44 = new JPanel();
+		categories = new JComboBox<Category>(Category.values());
+		panel44.add(new JLabel("Category: "));
+		panel44.add(categories);
+		pnlAdd.add(panel44);
+		JPanel panel22 = new JPanel();
+		txfLabel[1] = new JLabel(labelNames[1]);
+		txfField[1] = new JTextField(FIELD_SIZE);
+		panel22.add(txfLabel[1]);
+		panel22.add(txfField[1]);
+		pnlAdd.add(panel22);
+		JPanel panel33 = new JPanel();
+		txfLabel[2] = new JLabel(labelNames[2]);
+		txfField[2] = new JTextField(FIELD_SIZE);
+		panel33.add(txfLabel[2]);
+		panel33.add(txfField[2]);
+		pnlAdd.add(panel33);
 		pnlIngr = new JPanel();
 		pnlIngr.setLayout(new BoxLayout(pnlIngr,BoxLayout.Y_AXIS));
 		JPanel addPanel1 = new JPanel();
@@ -575,11 +591,11 @@ public class QAHGUI extends JFrame implements ActionListener, MouseListener
 			repaint();
 			
 		} else if (e.getSource() == btnAddRec) {
-			boolean good = true;
+		boolean good = true;
 			String title = txfField[0].getText();
-			String cate = txfField[1].getText();
-			String pTime =txfField[2].getText();
-			String cTime = txfField[3].getText();
+			String cate = (String) categories.getSelectedItem();
+			String pTime =txfField[1].getText();
+			String cTime = txfField[2].getText();
 			String[] ingrs = new String[ingrSize];
 			String directions = txaDirs.getText();
 			String[] nutInfo = new String[15];
@@ -601,7 +617,7 @@ public class QAHGUI extends JFrame implements ActionListener, MouseListener
 					Integer.parseInt(nutInfo[4]), Integer.parseInt(nutInfo[5]), Integer.parseInt(nutInfo[6]), Integer.parseInt(nutInfo[7]), Integer.parseInt(nutInfo[8]),
 					Integer.parseInt(nutInfo[9]), Integer.parseInt(nutInfo[10]), Integer.parseInt(nutInfo[11]), Integer.parseInt(nutInfo[12]), Integer.parseInt(nutInfo[13]), 
 					Integer.parseInt(nutInfo[14])); 
-			if(cate.equalsIgnoreCase("Quick and Healthy")){
+			if(cate.equalsIgnoreCase("Quick_and_Healthy")){
 				if(!(prepTime.getTime() <= quick.getTime())){
 					JOptionPane.showMessageDialog(this, "The Preporation Time is too Long for a Quick and Healthy Meal.", "", JOptionPane.WARNING_MESSAGE);
 					good = false;
