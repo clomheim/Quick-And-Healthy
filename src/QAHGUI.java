@@ -575,6 +575,7 @@ public class QAHGUI extends JFrame implements ActionListener, MouseListener
 			repaint();
 			
 		} else if (e.getSource() == btnAddRec) {
+			boolean good = true;
 			String title = txfField[0].getText();
 			String cate = txfField[1].getText();
 			String pTime =txfField[2].getText();
@@ -593,42 +594,56 @@ public class QAHGUI extends JFrame implements ActionListener, MouseListener
 			maxId++;
 			Time prepTime = Time.valueOf(pTime);
 			Time cookTime = Time.valueOf(cTime);
+			String str = "00:15:00";
+			Time quick = Time.valueOf(str);
 			List<String> ingredients = (Arrays.asList(ingrs));
 			NutritionalInfo ni = new NutritionalInfo(Float.parseFloat(nutInfo[0]), nutInfo[1], Integer.parseInt(nutInfo[2]), Integer.parseInt(nutInfo[3]), 
 					Integer.parseInt(nutInfo[4]), Integer.parseInt(nutInfo[5]), Integer.parseInt(nutInfo[6]), Integer.parseInt(nutInfo[7]), Integer.parseInt(nutInfo[8]),
 					Integer.parseInt(nutInfo[9]), Integer.parseInt(nutInfo[10]), Integer.parseInt(nutInfo[11]), Integer.parseInt(nutInfo[12]), Integer.parseInt(nutInfo[13]), 
 					Integer.parseInt(nutInfo[14])); 
-			Recipe recipe = new Recipe(maxId, title, cate, prepTime, cookTime, ingredients, directions, ni);
+			if(cate.equalsIgnoreCase("Quick and Healthy")){
+				if(!(prepTime.getTime() <= quick.getTime())){
+					JOptionPane.showMessageDialog(this, "The Preporation Time is too Long for a Quick and Healthy Meal.", "", JOptionPane.WARNING_MESSAGE);
+					good = false;
+				}
+				if(ni.getCalories() > 599){
+					JOptionPane.showMessageDialog(this, "There are too many calories for a Quick and Healthy Meal.", "", JOptionPane.WARNING_MESSAGE);
+					good = false;
+				}
+			}
+			if(good){
+				Recipe recipe = new Recipe(maxId, title, cate, prepTime, cookTime, ingredients, directions, ni);
 			
-			try {
-				db.addRecipe(username, recipe);
-			} catch (SQLException e1) {
-				e1.printStackTrace();
-			}
+				try {
+					db.addRecipe(username, recipe);
+				} catch (SQLException e1) {
+					e1.printStackTrace();
+				}
 			
-			content.removeAll();
-			content.add(pnlPers);
-			revalidate();
-			repaint();
+				content.removeAll();
+				content.add(pnlPers);
+				revalidate();
+				repaint();
 			
-			btnIngr.setEnabled(true);
-			for (int i = 0; i < txfField.length; i++){
-				if(txfField[i] != null)
-				txfField[i].setText("");
+				btnIngr.setEnabled(true);
+				for (int i = 0; i < txfField.length; i++){
+					if(txfField[i] != null)
+						txfField[i].setText("");
+					}
+				for (int i = 0; i < ingrSize;i++){
+					ingrField[i].setText("");
+				}
+				ingrSize = 0;
+				JLabel lab = new JLabel("Enter Ingredient");;
+				pnlIngr.removeAll();
+				pnlIngr.add(lab);
+				pnlIngr.add(ingrField[ingrSize]);
+				ingrSize++;
+				for (int i = 0; i < nutField.length;i++){
+					nutField[i].setText("");
+				}
+				txaDirs.setText("");
 			}
-			for (int i = 0; i < ingrSize;i++){
-				ingrField[i].setText("");
-			}
-			ingrSize = 0;
-			JLabel lab = new JLabel("Enter Ingredient");;
-			pnlIngr.removeAll();
-			pnlIngr.add(lab);
-			pnlIngr.add(ingrField[ingrSize]);
-			ingrSize++;
-			for (int i = 0; i < nutField.length;i++){
-				nutField[i].setText("");
-			}
-			txaDirs.setText("");
 		}
 		
 	}
