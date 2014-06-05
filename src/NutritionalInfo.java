@@ -35,4 +35,64 @@ public class NutritionalInfo {
 		my_calcium = calcium; 
 		my_iron = iron;
 	}
+	
+	public float getServingSize(){
+		return my_servingSize;
+	}
+	
+	public String getServingSizeUnit(){
+		return my_servingSizeUnit;
+	}
+
+	public int getCalories() {
+		return my_calories;
+	}
+
+	public int getCaloriesFromFat() {
+		return my_caloriesFromFat;
+	}
+
+	public int getSaturatedFat() {
+		return my_saturatedFat;
+	}
+
+	public int getCholesterol() {
+		return my_cholesterol;
+	}
+
+	public int getSodium() {
+		return my_sodium;
+	}
+
+	public int getTotalCarbohydrates() {
+		return my_totalCarbohydrates;
+	}
+
+	public int getDietaryFiber() {
+		return my_dietaryFiber;
+	}
+
+	public int getSugars() {
+		return my_sugars;
+	}
+
+	public int getProtein() {
+		return my_protein;
+	}
+
+	public int getVitaminA() {
+		return my_vitaminA;
+	}
+
+	public int getVitaminC() {
+		return my_vitaminC;
+	}
+
+	public int getCalcium() {
+		return my_calcium;
+	}
+
+	public int getIron() {
+		return my_iron;
+	}
 }

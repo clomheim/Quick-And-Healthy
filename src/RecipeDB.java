@@ -6,7 +6,6 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Time;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.Properties;
 import java.util.List;
 
@@ -138,22 +137,25 @@ public class RecipeDB {
 		try{
 			stmt = conn.createStatement();
 			ResultSet rs = stmt.executeQuery(query);
-			float servSiz = rs.getFloat("servingSize");
-			String uni = rs.getString("servingSizeUnit");
-			int cal = rs.getInt("calories");
-			int calFromFat = rs.getInt("caloriesFromFat");
-			int satFat = rs.getInt("saturatedFat");
-			int chol = rs.getInt("cholesteral");
-			int sod = rs.getInt("sodium");
-			int carb = rs.getInt("totalCarbohydrates");
-			int fib = rs.getInt("dietaryFiber");
-			int sug = rs.getInt("sugars");
-			int prot = rs.getInt("proein");
-			int vitA = rs.getInt("vitaminA");
-			int vitC = rs.getInt("vitaminC");
-			int calc = rs.getInt("calcium");
-			int iron = rs.getInt("iron");
-			ni = new NutritionalInfo(servSiz, uni, cal, calFromFat, satFat, chol, sod, carb, fib, sug, prot, vitA, vitC, calc, iron);
+			while(rs.next()){
+				float servSiz = rs.getFloat("servingSize");
+				String uni = rs.getString("servingSizeUnit");
+				int cal = rs.getInt("calories");
+				int calFromFat = rs.getInt("caloriesFromFat");
+				int satFat = rs.getInt("saturatedFat");
+				int chol = rs.getInt("cholesterol");
+				int sod = rs.getInt("sodium");
+				int carb = rs.getInt("totalCarbohydrates");
+				int fib = rs.getInt("dietaryFiber");
+				int sug = rs.getInt("sugars");
+				int prot = rs.getInt("protein");
+				int vitA = rs.getInt("vitaminA");
+				int vitC = rs.getInt("vitaminC");
+				int calc = rs.getInt("calcium");
+				int iron = rs.getInt("iron");
+				ni = new NutritionalInfo(servSiz, uni, cal, calFromFat, satFat, chol, sod, carb, fib, sug, prot, vitA, vitC, calc, iron);
+			}
+			
 		} catch (SQLException e) {
 			System.out.println(e);
 		} finally {
@@ -165,6 +167,124 @@ public class RecipeDB {
 		return ni;
 	}
 	
+	/**
+	 * Gets a list of user favorited recipes
+	 * 
+	 * @author Claire
+	 * @param user
+	 * @return
+	 * @throws SQLException
+	 */
+	public List<Recipe> getUserFavorites(String user) throws SQLException{
+		if (conn == null) {
+			createConnection();
+		}
+		Statement stmt = null;
+		String query = "select recipeID "
+				+ "from quickandhealthymeals.userfavorites where username = '" + user + "';";
+
+		List<Recipe> recipe = new ArrayList<Recipe>();
+		try {
+			stmt = conn.createStatement();
+			ResultSet rs = stmt.executeQuery(query);
+			while (rs.next()) {
+				int id = rs.getInt("recipeID");
+				Recipe rec = getRecipe(id);
+				recipes.add(rec);
+			}
+		} catch (SQLException e) {
+			System.out.println(e);
+		} finally {
+			if (stmt != null) {
+				stmt.close();
+			}
+		}
+		return recipe;
+	}
+	
+	/**
+	 * Gets a list of recipes created by the user
+	 * 
+	 * @author Claire
+	 * @param user
+	 * @return
+	 * @throws SQLException
+	 */
+	public List<Recipe> getUserRecipes(String user) throws SQLException{
+		if (conn == null) {
+			createConnection();
+		}
+		Statement stmt = null;
+		String query = "select recipeID, recipeTitle, category, prepTime, cookTime, directions "
+				+ "from quickandhealthymeals.recipe where username = '" + user + "';";
+
+		List<Recipe> recipe = new ArrayList<Recipe>();
+		try {
+			stmt = conn.createStatement();
+			ResultSet rs = stmt.executeQuery(query);
+			while (rs.next()) {
+				int id = rs.getInt("recipeID");
+				String title = rs.getString("recipeTitle");
+				String cat = rs.getString("category");
+				Time prep = rs.getTime("prepTime");
+				Time cook = rs.getTime("cookTime");
+				List<String> ingr = getIngredients(id);
+				String dir = rs.getString("directions");
+				NutritionalInfo ni = getNutInfo(id);
+				Recipe rec = new Recipe(id, title, cat, prep, cook, ingr, dir, ni);
+				recipes.add(rec);
+			}
+		} catch (SQLException e) {
+			System.out.println(e);
+		} finally {
+			if (stmt != null) {
+				stmt.close();
+			}
+		}
+		return recipe;
+	}
+	
+	/**
+	 * Gets a single recipe, based on the recipe ID.
+	 * 
+	 * @author Claire
+	 * @param recid
+	 * @return
+	 * @throws SQLException
+	 */
+	private Recipe getRecipe(int recid) throws SQLException{
+		if (conn == null) {
+			createConnection();
+		}
+		Statement stmt = null;
+		String query = "select recipeID, recipeTitle, category, prepTime, cookTime, directions "
+				+ "from quickandhealthymeals.recipe where recipeID = " + recid + ";";
+
+		Recipe recip = null;
+		try {
+			stmt = conn.createStatement();
+			ResultSet rs = stmt.executeQuery(query);
+			while (rs.next()) {
+				int id = rs.getInt("recipeID");
+				String title = rs.getString("recipeTitle");
+				String cat = rs.getString("category");
+				Time prep = rs.getTime("prepTime");
+				Time cook = rs.getTime("cookTime");
+				List<String> ingr = getIngredients(id);
+				String dir = rs.getString("directions");
+				NutritionalInfo ni = getNutInfo(id);
+				recip = new Recipe(id, title, cat, prep, cook, ingr, dir, ni);
+			}
+		} catch (SQLException e) {
+			System.out.println(e);
+		} finally {
+			if (stmt != null) {
+				stmt.close();
+			}
+		}
+		return recip;
+	}
+	
 	/** 
 	 * Adds a recipe to the database.
 	 * @param user The user to whom the recipe belongs.
@@ -172,11 +292,11 @@ public class RecipeDB {
 	 * @throws SQLException
 	 * @author Erica
 	 */
-	public static void addRecipe(User user, Recipe recipe) throws SQLException {
+	public void addRecipe(String user, Recipe recipe) throws SQLException {
 		if (conn == null) {
 			createConnection();
 		}
-		String sql = "INSERT INTO Recipe VALUES (?, ?, ?, ?, ?, ?, ?, NULL)";
+		String sql = "INSERT INTO quickandhealthymeals.recipe VALUES (?, ?, ?, ?, ?, ?, ?)";
 		
 		PreparedStatement prepStatement = null; 
 		
@@ -184,16 +304,60 @@ public class RecipeDB {
 			prepStatement = conn.prepareStatement(sql);
 			prepStatement.setInt(1, recipe.getRecipeID());
 			incrementRecipeID();
-			prepStatement.setString(2, user.getUsername());
+			prepStatement.setString(2, user);
 			prepStatement.setString(3, recipe.getRecipeTitle());
 			prepStatement.setString(4,  recipe.getCategory());
 			prepStatement.setTime(5, recipe.getPrepTime());
 			prepStatement.setTime(6, recipe.getCookTime());
+			prepStatement.setString(7,  recipe.getDirections());
 			prepStatement.executeUpdate();
 		} catch (SQLException e) {
 			System.out.println(e);
 			e.printStackTrace();
 		}
+		
+		sql = "INSERT INTO quickandhealthymeals.recipeingredients VALUES (?, ?);";
+		prepStatement = null;
+		List<String> ingr = recipe.getIngredients();
+		for (String s : ingr){
+			try {
+				prepStatement = conn.prepareStatement(sql);
+				prepStatement.setInt(1, recipe.getRecipeID());
+				prepStatement.setString(2, s);
+				prepStatement.executeUpdate();
+			} catch (SQLException e) {
+				System.out.println(e);
+				e.printStackTrace();
+			}
+		}
+		
+		sql = "INSERT INTO quickandhealthymeals.nutritionalinformation VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
+		prepStatement = null;
+		NutritionalInfo ni = recipe.getNutritionalInfo();
+			try {
+				prepStatement = conn.prepareStatement(sql);
+				prepStatement.setInt(1, recipe.getRecipeID());
+				prepStatement.setFloat(2, ni.getServingSize());
+				prepStatement.setString(3, ni.getServingSizeUnit());
+				prepStatement.setInt(4, ni.getCalories());
+				prepStatement.setInt(5, ni.getCaloriesFromFat());
+				prepStatement.setInt(6, ni.getSaturatedFat());
+				prepStatement.setInt(7, ni.getCholesterol());
+				prepStatement.setInt(8, ni.getSodium());
+				prepStatement.setInt(9, ni.getTotalCarbohydrates());
+				prepStatement.setInt(10, ni.getDietaryFiber());
+				prepStatement.setInt(11, ni.getSugars());
+				prepStatement.setInt(12, ni.getProtein());
+				prepStatement.setInt(13, ni.getVitaminA());
+				prepStatement.setInt(14, ni.getVitaminC());
+				prepStatement.setInt(15, ni.getCalcium());
+				prepStatement.setInt(16, ni.getIron());
+				prepStatement.executeUpdate();
+			} catch (SQLException e) {
+				System.out.println(e);
+				e.printStackTrace();
+			}
+		
 	}
 	
 	/**
@@ -203,7 +367,7 @@ public class RecipeDB {
 	 * @throws SQLException
 	 * @author Erica
 	 */
-	public static void addIngredientToRecipe(Recipe recipe, String ingredient) throws SQLException {
+	public void addIngredientToRecipe(Recipe recipe, String ingredient) throws SQLException {
 		if (conn == null) {
 			createConnection();
 		}
@@ -222,6 +386,97 @@ public class RecipeDB {
  		}
 	}
 	
+	public List<Recipe> searchRecipes(String token) throws SQLException{
+		if (conn == null) {
+			createConnection();
+		}
+		List<Recipe> recipe = new ArrayList<Recipe>();
+		//TODO search for token in recipe category, title, and ingredients
+		return recipe;
+	}
+	
+	/**
+	 * Removes a recipe and all related entries from the Database.
+	 * 
+	 * @author Claire
+	 * @param recipe
+	 * @throws SQLException 
+	 */
+	public void removeRecipe(Recipe recipe) throws SQLException{
+		if (conn == null) {
+			createConnection();
+		}
+		String sql = "DELETE FROM quickandhealthymeals.nutritionalInformation WHERE recipeID = " + recipe.getRecipeID();
+		
+		PreparedStatement prepStatement = null; 
+		
+		try {
+			prepStatement = conn.prepareStatement(sql);
+			prepStatement.executeUpdate();
+ 		} catch (SQLException e) {
+ 			System.out.println(e);
+			e.printStackTrace();	
+ 		}
+		sql = "DELETE FROM quickandhealthymeals.recipe WHERE recipeID = " + recipe.getRecipeID();
+		
+		prepStatement = null; 
+		
+		try {
+			prepStatement = conn.prepareStatement(sql);
+			prepStatement.executeUpdate();
+ 		} catch (SQLException e) {
+ 			System.out.println(e);
+			e.printStackTrace();	
+ 		}
+		sql = "DELETE FROM quickandhealthymeals.recipeingredients WHERE recipeID = " + recipe.getRecipeID();
+		
+		prepStatement = null; 
+		
+		try {
+			prepStatement = conn.prepareStatement(sql);
+			prepStatement.executeUpdate();
+ 		} catch (SQLException e) {
+ 			System.out.println(e);
+			e.printStackTrace();	
+	 		}
+		sql = "DELETE FROM quickandhealthymeals.userfavorites WHERE recipeID = " + recipe.getRecipeID();
+		
+		prepStatement = null; 
+		
+		try {
+			prepStatement = conn.prepareStatement(sql);
+			prepStatement.executeUpdate();
+ 		} catch (SQLException e) {
+ 			System.out.println(e);
+			e.printStackTrace();	
+ 		}
+	}
+	
+	/**
+	 * Removes a recipe from a User's favorite list.
+	 * 
+	 * @author Claire
+	 * @param recipe
+	 * @throws SQLException 
+	 */
+	public void removeFavorite(Recipe recipe) throws SQLException{
+		if (conn == null) {
+			createConnection();
+		}
+		String sql = "DELETE FROM quickandhealthymeals.userfavorites WHERE recipeID = " + recipe.getRecipeID();
+		
+		PreparedStatement prepStatement = null; 
+		
+		try {
+			prepStatement = conn.prepareStatement(sql);
+			prepStatement.executeUpdate();
+ 		} catch (SQLException e) {
+ 			System.out.println(e);
+			e.printStackTrace();	
+ 		}
+		
+	}
+	
 	private static void incrementRecipeID() {
 		recipe_id++;
 	}
@@ -233,7 +488,7 @@ public class RecipeDB {
 	 * @throws SQLException
 	 * @author Erica
 	 */
-	public static void registerUser(String user, String password) throws SQLException {
+	public void registerUser(String user, String password) throws SQLException {
 		if (conn == null) {
 			createConnection();
 		}
@@ -256,7 +511,7 @@ public class RecipeDB {
 	 * @param user The user to check for.
 	 * @return True if the user was found, false otherwise.
 	 */
-	public static boolean userExists(String user) throws SQLException {
+	public boolean userExists(String user) throws SQLException {
 		if (conn == null) {
 			createConnection();
 		}
@@ -270,10 +525,12 @@ public class RecipeDB {
 		try {
 			statement = conn.createStatement();
 			ResultSet rs = statement.executeQuery(query);
-			String name = rs.getString("username");
+			while(rs.next()){
+				String name = rs.getString("username");
 			
-			if (name != null) {
-				found = true;
+				if (name != null) {
+					found = true;
+				}
 			}
 			
 		} catch (SQLException e) {
@@ -292,7 +549,7 @@ public class RecipeDB {
 	 * @throws SQLException
 	 * @author Erica
 	 */
-	public static boolean loginValidation(String user, String password) throws SQLException {
+	public boolean loginValidation(String user, String password) throws SQLException {
 		if (conn == null) {
 			createConnection();
 		}

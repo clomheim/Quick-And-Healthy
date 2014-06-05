@@ -1,5 +1,5 @@
 import java.sql.Time;
-import java.util.Date;
+import java.util.ArrayList;
 import java.util.List;
 
 /** 
@@ -24,10 +24,11 @@ public class Recipe {
 		my_recipeTitle = recipeTitle;
 		my_category = category;
 		my_prepTime = prepTime; 
-		my_cookTime = cookTime; 
+		my_cookTime = cookTime;
+		my_ingredients = new ArrayList<String>();
 		
 		for (String s : ingredients) {
-			my_ingredients.add(s);
+				my_ingredients.add(s);
 		}
 		
 		my_directions = directions;
@@ -57,6 +58,18 @@ public class Recipe {
 	
 	public Time getCookTime() {
 		return my_cookTime;
+	}
+	
+	public String getDirections() {
+		return my_directions;
+	}
+	
+	public List<String> getIngredients() {
+		return my_ingredients;
+	}
+	
+	public NutritionalInfo getNutritionalInfo(){
+		return my_nutritionalInfo;
 	}
 	
 	@Override
