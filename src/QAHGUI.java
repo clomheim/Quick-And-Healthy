@@ -20,7 +20,7 @@ public class QAHGUI extends JFrame implements ActionListener, MouseListener
 	
 	private final int FIELD_SIZE = 25;
 	
-	private JButton btnFav, btnPers, btnAdd, btnPas, btnSearch, btnIngr, btnSub, btnReg, btnLog, btnToReg, btnAddRec;
+	private JButton btnFav, btnPers, btnAdd, btnPas, btnSearch, btnIngr, btnSub, btnReg, btnLog, btnToReg, btnAddRec, btnLike;
 	private JPanel pnlMenu, pnlTop, pnlButtons, pnlFav, pnlPers, pnlIngr, pnlPass, pnlReg, pnlLog, content;
 	private RecipeDB db;
 	private List<Recipe> list, favList, persList;
@@ -268,12 +268,37 @@ public class QAHGUI extends JFrame implements ActionListener, MouseListener
 		add(pnlLog, BorderLayout.NORTH);
 	}
 	
-	private void createRecipeFrame(Recipe recipe){
-		//TODO
+	private void createRecipeFrame(final Recipe recipe){
 		JFrame rec = new JFrame(recipe.getRecipeTitle());
 		rec.setLayout(new BoxLayout(rec.getContentPane(), BoxLayout.PAGE_AXIS));
+		JPanel tops = new JPanel();
+		JPanel btn = new JPanel();
+		btn.setAlignmentX(Component.RIGHT_ALIGNMENT);
+		tops.setLayout(new GridLayout(1, 2));
+		tops.setAlignmentX(Component.LEFT_ALIGNMENT);
+		btnLike = new JButton("Favorite");
+		btnLike.addActionListener(new ActionListener(){
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				try {
+					db.addFavorite(recipe, username);
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}	
+			}
+		});
+		for(Recipe r: favList){
+			if(r.getRecipeID() == recipe.getRecipeID()){
+				btnLike.setEnabled(false);
+				btnLike.setVisible(false);
+			}
+		}
+		btnLike.setAlignmentX(Component.RIGHT_ALIGNMENT);
 		lblTop.setAlignmentX(Component.LEFT_ALIGNMENT);
-		rec.add(lblTop);
+		btn.add(btnLike);
+		tops.add(lblTop);
+		tops.add(btn);
+		rec.add(tops);
 		JLabel ti = new JLabel("Recipe: " + recipe.getRecipeTitle());
 		ti.setAlignmentX(Component.LEFT_ALIGNMENT);
 		rec.add(ti);
@@ -293,7 +318,7 @@ public class QAHGUI extends JFrame implements ActionListener, MouseListener
 		JPanel super2 = new JPanel();
 		super2.setAlignmentX(Component.LEFT_ALIGNMENT);
 		JLabel direct = new JLabel("Directions:");
-		direct.setAlignmentX(Component.TOP_ALIGNMENT);
+		direct.setAlignmentY(Component.TOP_ALIGNMENT);
 		super2.add(direct);
 		super2.add(dir);
 		JPanel panel2 = new JPanel();
@@ -329,13 +354,13 @@ public class QAHGUI extends JFrame implements ActionListener, MouseListener
 		panel3.add(new JLabel("Protein"));
 		panel3.add(new JLabel(Integer.toString(ni.getProtein()) + "g"));
 		panel3.add(new JLabel("Vitamin A"));
-		panel3.add(new JLabel(Integer.toString(ni.getVitaminA()) + "/%"));
+		panel3.add(new JLabel(Integer.toString(ni.getVitaminA()) + "%"));
 		panel3.add(new JLabel("VItamin C"));
-		panel3.add(new JLabel(Integer.toString(ni.getVitaminC()) + "/%"));
+		panel3.add(new JLabel(Integer.toString(ni.getVitaminC()) + "%"));
 		panel3.add(new JLabel("Calcium"));
-		panel3.add(new JLabel(Integer.toString(ni.getCalcium()) + "/%"));
+		panel3.add(new JLabel(Integer.toString(ni.getCalcium()) + "%"));
 		panel3.add(new JLabel("Iron"));
-		panel3.add(new JLabel(Integer.toString(ni.getIron()) + "/%"));
+		panel3.add(new JLabel(Integer.toString(ni.getIron()) + "%"));
 		
 		rec.setLocationRelativeTo(this);
 		rec.add(panel3);
@@ -416,7 +441,6 @@ public class QAHGUI extends JFrame implements ActionListener, MouseListener
 			data = new Object[list.size()][columnNames.length];
 			for (int i=0; i<list.size(); i++) {
 				data[i][0] = list.get(i).getRecipeTitle();
-				data[i][1] = "Remove";
 			}
 			tblSearch = new JTable(data, columnNames);
 			tblSearch.addMouseListener(this);
@@ -460,10 +484,13 @@ public class QAHGUI extends JFrame implements ActionListener, MouseListener
 			if(same){
 				try {
 					if (db.loginValidation(username, oldPassword)) {
-						//TODO register new password
-						//db.changePassword(username, newPassword);
+						db.changePassword(username, newPassword);
+						JOptionPane.showMessageDialog(this, "Your Password has been updated!");
+						passField[0].setText("");
+						passField[1].setText("");
+						passField[2].setText("");
 					} else {
-						JOptionPane.showMessageDialog(this, "Passwordand Username Do Not Match!", "", JOptionPane.WARNING_MESSAGE);
+						JOptionPane.showMessageDialog(this, "Password and Username Do Not Match!", "", JOptionPane.WARNING_MESSAGE);
 					}
 				} catch (SQLException e1) {
 					e1.printStackTrace();

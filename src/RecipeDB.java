@@ -386,12 +386,66 @@ public class RecipeDB {
  		}
 	}
 	
+	public void addFavorite(Recipe recipe, String user) throws SQLException{
+		if (conn == null) {
+			createConnection();
+		}
+		String sql = "INSERT INTO quickandhealthymeals.userfavorites VALUES (?, ?)";
+		
+		PreparedStatement prepStatement = null; 
+		
+		try {
+			prepStatement = conn.prepareStatement(sql);
+			prepStatement.setString(1,  user);
+			prepStatement.setInt(2, recipe.getRecipeID());
+			prepStatement.executeUpdate();
+ 		} catch (SQLException e) {
+ 			System.out.println(e);
+			e.printStackTrace();	
+ 		}
+	}
+	
 	public List<Recipe> searchRecipes(String token) throws SQLException{
 		if (conn == null) {
 			createConnection();
 		}
 		List<Recipe> recipe = new ArrayList<Recipe>();
-		//TODO search for token in recipe category, title, and ingredients
+		
+		Statement stmt = null;
+		String query = "select recipeID, recipeTitle, category, prepTime, cookTime, directions "
+				+ "from quickandhealthymeals.recipe where recipeTitle LIKE '%" + token + "%'" 
+				+ "OR category LIKE '%" + token + "%';";
+
+		try {
+			stmt = conn.createStatement();
+			ResultSet rs = stmt.executeQuery(query);
+			while (rs.next()) {
+				int id = rs.getInt("recipeID");
+				String title = rs.getString("recipeTitle");
+				String cat = rs.getString("category");
+				Time prep = rs.getTime("prepTime");
+				Time cook = rs.getTime("cookTime");
+				List<String> ingr = getIngredients(id);
+				String dir = rs.getString("directions");
+				NutritionalInfo ni = getNutInfo(id);
+				recipe.add(new Recipe(id, title, cat, prep, cook, ingr, dir, ni));
+			}
+		} catch (SQLException e) {
+			System.out.println(e);
+		} 
+		
+		stmt = null;
+		query =  "select recipeID from quickandhealthymeals.recipeingredients where ingredientName LIKE '%" + token + "%';";
+		try {
+			stmt = conn.createStatement();
+			ResultSet rs = stmt.executeQuery(query);
+			while(rs.next()){
+				int id = rs.getInt("recipeID");
+				recipe.add(getRecipe(id));
+			}
+		}catch (SQLException e) {
+				System.out.println(e);
+		}
 		return recipe;
 	}
 	
@@ -581,7 +635,24 @@ public class RecipeDB {
 		return matchFound;
 	}
 	
-	public void changePassword(String user, String password){
-		//TODO
+	public void changePassword(String user, String password) throws SQLException{
+		if (conn == null) {
+			createConnection();
+		}
+		
+		String query = "UPDATE quickandhealthymeals.user SET userPassword = '" 
+					+ password +"' WHERE username = '" + user + "';";
+		
+		Statement statement = null;
+		
+		try {
+			statement = conn.createStatement();
+			statement.executeUpdate(query);
+			
+		} catch (SQLException e) {
+			System.out.println(e);
+			e.printStackTrace();
+		}
+		
 	}
 }
