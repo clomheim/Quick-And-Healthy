@@ -1,4 +1,5 @@
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridLayout;
@@ -68,6 +69,7 @@ public class QAHGUI extends JFrame implements ActionListener, MouseListener
 		createComponents();
 		setVisible(true);
 		setSize(600, 600);
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	}
     
 	private void createComponents()
@@ -235,7 +237,7 @@ public class QAHGUI extends JFrame implements ActionListener, MouseListener
 		////////////////////////////////////////////////////////
 		pnlLog = new JPanel();
 		pnlLog.setLayout(new BorderLayout());
-		lblTop = new JLabel("Quack And Healthy Meals");
+		lblTop = new JLabel("Quick And Healthy Meals");
 		lblTop.setHorizontalAlignment(JLabel.CENTER);
 		lblTop.setFont(new Font("Serif", Font.PLAIN, 20));
 		pnlLog.add(lblTop, BorderLayout.NORTH);
@@ -268,6 +270,77 @@ public class QAHGUI extends JFrame implements ActionListener, MouseListener
 	
 	private void createRecipeFrame(Recipe recipe){
 		//TODO
+		JFrame rec = new JFrame(recipe.getRecipeTitle());
+		rec.setLayout(new BoxLayout(rec.getContentPane(), BoxLayout.PAGE_AXIS));
+		lblTop.setAlignmentX(Component.LEFT_ALIGNMENT);
+		rec.add(lblTop);
+		JLabel ti = new JLabel("Recipe: " + recipe.getRecipeTitle());
+		ti.setAlignmentX(Component.LEFT_ALIGNMENT);
+		rec.add(ti);
+		JPanel panel1 = new JPanel();
+		panel1.setAlignmentX(Component.LEFT_ALIGNMENT);
+		panel1.setLayout(new BoxLayout(panel1, BoxLayout.Y_AXIS));
+		JLabel cat = new JLabel("Category: " + recipe.getCategory());
+		JLabel prep = new JLabel("Prep Time: " + recipe.getPrepTime().toString());
+		JLabel cook = new JLabel("Cook Time: " + recipe.getCookTime().toString());
+		panel1.add(cat);
+		panel1.add(prep);
+		panel1.add(cook);
+		rec.add(panel1);
+		JTextArea dir = new JTextArea(recipe.getDirections());
+		dir.setEditable(false);
+		dir.setColumns(20);
+		JPanel super2 = new JPanel();
+		super2.setAlignmentX(Component.LEFT_ALIGNMENT);
+		JLabel direct = new JLabel("Directions:");
+		direct.setAlignmentX(Component.TOP_ALIGNMENT);
+		super2.add(direct);
+		super2.add(dir);
+		JPanel panel2 = new JPanel();
+		panel2.setLayout(new BoxLayout(panel2, BoxLayout.Y_AXIS));
+		List<String> ing = recipe.getIngredients();
+		for(int i = 0; i< ing.size();i++){
+			panel2.add(new JLabel(ing.get(i)));
+		}
+		super2.add(panel2);
+		rec.add(super2);
+		NutritionalInfo ni = recipe.getNutritionalInfo();
+		JPanel panel3 = new JPanel();
+		panel3.setLayout(new GridLayout(14, 2));
+		panel3.setAlignmentX(Component.LEFT_ALIGNMENT);
+		panel3.add(new JLabel("Serving Size: " + Float.toString(ni.getServingSize())));
+		panel3.add(new JLabel(ni.getServingSizeUnit()));
+		panel3.add(new JLabel("Calories"));
+		panel3.add(new JLabel(Integer.toString(ni.getCalories())));
+		panel3.add(new JLabel("Calories From Fat"));
+		panel3.add(new JLabel(Integer.toString(ni.getCaloriesFromFat())));
+		panel3.add(new JLabel("Saturated Fat"));
+		panel3.add(new JLabel(Integer.toString(ni.getSaturatedFat()) + "g"));
+		panel3.add(new JLabel("Cholesterol"));
+		panel3.add(new JLabel(Integer.toString(ni.getCholesterol()) + "mg"));
+		panel3.add(new JLabel("Sodium"));
+		panel3.add(new JLabel(Integer.toString(ni.getSodium()) + "mg"));
+		panel3.add(new JLabel("Total Carbohydrates"));
+		panel3.add(new JLabel(Integer.toString(ni.getTotalCarbohydrates()) + "g"));
+		panel3.add(new JLabel("Dietary Fiber"));
+		panel3.add(new JLabel(Integer.toString(ni.getDietaryFiber()) + "g"));
+		panel3.add(new JLabel("Sugars"));
+		panel3.add(new JLabel(Integer.toString(ni.getSugars()) + "g"));
+		panel3.add(new JLabel("Protein"));
+		panel3.add(new JLabel(Integer.toString(ni.getProtein()) + "g"));
+		panel3.add(new JLabel("Vitamin A"));
+		panel3.add(new JLabel(Integer.toString(ni.getVitaminA()) + "/%"));
+		panel3.add(new JLabel("VItamin C"));
+		panel3.add(new JLabel(Integer.toString(ni.getVitaminC()) + "/%"));
+		panel3.add(new JLabel("Calcium"));
+		panel3.add(new JLabel(Integer.toString(ni.getCalcium()) + "/%"));
+		panel3.add(new JLabel("Iron"));
+		panel3.add(new JLabel(Integer.toString(ni.getIron()) + "/%"));
+		
+		rec.setLocationRelativeTo(this);
+		rec.add(panel3);
+		rec.pack();
+		rec.setVisible(true);
 	}
 
 	/**
@@ -299,10 +372,9 @@ public class QAHGUI extends JFrame implements ActionListener, MouseListener
 			pnlFav.add(scrlPnFav);
 			content.removeAll();
 			content.add(pnlFav);
-			add(content, BorderLayout.CENTER);
 			revalidate();
 			repaint();
-		} else if (e.getSource() == btnPers){;
+		} else if (e.getSource() == btnPers){
 			try {
 				persList = db.getUserRecipes(username);
 			} catch (SQLException e1) {
@@ -389,7 +461,7 @@ public class QAHGUI extends JFrame implements ActionListener, MouseListener
 				try {
 					if (db.loginValidation(username, oldPassword)) {
 						//TODO register new password
-						//RecipeDB.changePassword(username, newPassword);
+						//db.changePassword(username, newPassword);
 					} else {
 						JOptionPane.showMessageDialog(this, "Passwordand Username Do Not Match!", "", JOptionPane.WARNING_MESSAGE);
 					}
@@ -500,17 +572,19 @@ public class QAHGUI extends JFrame implements ActionListener, MouseListener
 					Integer.parseInt(nutInfo[9]), Integer.parseInt(nutInfo[10]), Integer.parseInt(nutInfo[11]), Integer.parseInt(nutInfo[12]), Integer.parseInt(nutInfo[13]), 
 					Integer.parseInt(nutInfo[14])); 
 			Recipe recipe = new Recipe(maxId, title, cate, prepTime, cookTime, ingredients, directions, ni);
+			
+			try {
+				db.addRecipe(username, recipe);
+			} catch (SQLException e1) {
+				e1.printStackTrace();
+			}
+			
 			content.removeAll();
 			content.add(pnlPers);
 			revalidate();
 			repaint();
 			
 			btnIngr.setEnabled(true);
-			try {
-				db.addRecipe(username, recipe);
-			} catch (SQLException e1) {
-				e1.printStackTrace();
-			}
 			for (int i = 0; i < txfField.length; i++){
 				if(txfField[i] != null)
 				txfField[i].setText("");
@@ -538,12 +612,10 @@ public class QAHGUI extends JFrame implements ActionListener, MouseListener
 		int row = tab.getSelectedRow();
 		int column = tab.getSelectedColumn();
 		if(tab.equals(tblFav)){
-			System.out.println("fav");
-			if(column == 0){
-				System.out.println("0");
-				//TODO show Recipe
+			if(column == 0){;
+				Recipe rec = favList.get(row);
+				createRecipeFrame(rec);
 			} else {
-				System.out.println("1");
 				Recipe rec = favList.get(row);
 				try {
 					db.removeFavorite(rec);
@@ -554,12 +626,10 @@ public class QAHGUI extends JFrame implements ActionListener, MouseListener
 			}
 		}
 		if(tab.equals(tblPers)){
-			System.out.println("pers");
 			if(column == 0){
-				System.out.println("0");
-				//TODO Show Recipe
+				Recipe rec = persList.get(row);
+				createRecipeFrame(rec);
 			} else {
-				System.out.println("1");
 				Recipe rec = persList.get(row);
 				try {
 					db.removeRecipe(rec);
@@ -570,8 +640,8 @@ public class QAHGUI extends JFrame implements ActionListener, MouseListener
 			}
 		}
 		if(tab.equals(tblSearch)){
-			System.out.println("search");
-			//TODO
+			Recipe rec = list.get(row);
+			createRecipeFrame(rec);
 		}
 		
 		revalidate();

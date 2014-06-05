@@ -190,7 +190,7 @@ public class RecipeDB {
 			while (rs.next()) {
 				int id = rs.getInt("recipeID");
 				Recipe rec = getRecipe(id);
-				recipes.add(rec);
+				recipe.add(rec);
 			}
 		} catch (SQLException e) {
 			System.out.println(e);
@@ -232,7 +232,7 @@ public class RecipeDB {
 				String dir = rs.getString("directions");
 				NutritionalInfo ni = getNutInfo(id);
 				Recipe rec = new Recipe(id, title, cat, prep, cook, ingr, dir, ni);
-				recipes.add(rec);
+				recipe.add(rec);
 			}
 		} catch (SQLException e) {
 			System.out.println(e);
@@ -316,7 +316,7 @@ public class RecipeDB {
 			e.printStackTrace();
 		}
 		
-		sql = "INSERT INTO quickandhealthymeals.recipeingredients VALUES (?, ?);";
+		sql = "INSERT INTO quickandhealthymeals.recipeingredients VALUES (?, ?, NULL);";
 		prepStatement = null;
 		List<String> ingr = recipe.getIngredients();
 		for (String s : ingr){
@@ -579,5 +579,9 @@ public class RecipeDB {
 		}
 		
 		return matchFound;
+	}
+	
+	public void changePassword(String user, String password){
+		//TODO
 	}
 }
