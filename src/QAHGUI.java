@@ -127,7 +127,7 @@ public class QAHGUI extends JFrame implements ActionListener, MouseListener
 		////////////////////////////////////////////////////////
 		pnlAdd = new JPanel();
 		pnlAdd.setLayout(new BoxLayout(pnlAdd, BoxLayout.Y_AXIS));
-		String labelNames[] = {"Enter Recipe Name: ",  "Enter Preparation Time: ", "Enter Cook Time: "};
+		String labelNames[] = {"Enter Recipe Name: ",  "Enter Preparation Time (HH:MM:SS): ", "Enter Cook Time (HH:MM:SS): "};
 		JPanel panel11 = new JPanel();
 		txfLabel[0] = new JLabel(labelNames[0]);
 		txfField[0] = new JTextField(FIELD_SIZE);
@@ -177,9 +177,9 @@ public class QAHGUI extends JFrame implements ActionListener, MouseListener
 		direc.add(txaDirs);
 		pnlAdd.add(direc);
 		JPanel panel2 = new JPanel();
-		String nutInfo[] = {"Enter Serving Size: ", "Enter Serving Size Unit: ", "Enter Calories: ", "Enter Calories From Fat: ", "Enter Saturated Fat: ",
-				"Enter Cholestoral: ", "Enter Sodium: ", "Enter Total Carbohydrates: ", "Enter Dietary Fiber: ", "Enter Sugars: ", "Enter Protein: ", "Enter Vitamin A: ",
-				"Enter Vitamin C: ", "Enter Calcium: ", "Enter Iron: "};
+		String nutInfo[] = {"Enter Serving Size: ", "Enter Serving Size Unit: ", "Enter Calories: ", "Enter Calories From Fat: ", "Enter Saturated Fat (g): ",
+				"Enter Cholestoral (mg): ", "Enter Sodium (mg): ", "Enter Total Carbohydrates (g): ", "Enter Dietary Fiber (g): ", "Enter Sugars (g): ", "Enter Protein (g): ", "Enter Vitamin A (%): ",
+				"Enter Vitamin C (%): ", "Enter Calcium (%): ", "Enter Iron (%): "};
 		for (int i=0; i<nutInfo.length; i++) {
 			JPanel panel = new JPanel();
 			nutLabel[i] = new JLabel(nutInfo[i]);
@@ -593,7 +593,7 @@ public class QAHGUI extends JFrame implements ActionListener, MouseListener
 		} else if (e.getSource() == btnAddRec) {
 		boolean good = true;
 			String title = txfField[0].getText();
-			String cate = (String) categories.getSelectedItem();
+			String cate = (String) categories.getSelectedItem().toString();
 			String pTime =txfField[1].getText();
 			String cTime = txfField[2].getText();
 			String[] ingrs = new String[ingrSize];
